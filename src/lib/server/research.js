@@ -1,4 +1,7 @@
 import { db } from './db.js';
+import { assertBindable, assertNumericFields } from './apiHelpers.js';
+
+const NOTE_COLUMNS = ['room_id', 'whole_home_item_id', 'category_id', 'body', 'sources'];
 
 export function createResearchNote({ room_id = null, whole_home_item_id = null, category_id = null, body, sources = '' }) {
 	const hasRoom = room_id !== null && room_id !== undefined;
@@ -6,6 +9,10 @@ export function createResearchNote({ room_id = null, whole_home_item_id = null, 
 	if (hasRoom === hasWholeHome) {
 		throw new Error('A research note must be linked to exactly one of room_id or whole_home_item_id');
 	}
+
+	const fields = { room_id, whole_home_item_id, category_id, body, sources };
+	assertNumericFields(fields, ['room_id', 'whole_home_item_id', 'category_id']);
+	assertBindable(fields, NOTE_COLUMNS);
 
 	const { lastInsertRowid } = db
 		.prepare(

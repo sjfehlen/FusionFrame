@@ -1,4 +1,5 @@
 import { db } from './db.js';
+import { assertBindable, assertNumericFields } from './apiHelpers.js';
 
 const ROOM_COLUMNS = [
 	'name',
@@ -16,8 +17,32 @@ const ROOM_COLUMNS = [
 	'accessibility_notes'
 ];
 
+/** Physical attributes that must hold a real number when supplied. */
+export const NUMERIC_ROOM_FIELDS = [
+	'sqft',
+	'ceiling_height_in',
+	'floor_level',
+	'distance_from_closet_ft',
+	'exterior_wall_count',
+	'window_count'
+];
+
+/**
+ * Shared validation for every room write path (API POST/PATCH and form
+ * actions) so no caller can bypass it. Throws a clean Error on bad input,
+ * which route handlers turn into a 400.
+ */
+function validateRoomFields(fields, columns) {
+	assertNumericFields(
+		fields,
+		NUMERIC_ROOM_FIELDS.filter((c) => columns.includes(c))
+	);
+	assertBindable(fields, columns);
+}
+
 export function createRoom(fields) {
 	const columns = ROOM_COLUMNS.filter((c) => fields[c] !== undefined);
+	validateRoomFields(fields, columns);
 	const placeholders = columns.map(() => '?').join(', ');
 	const values = columns.map((c) => fields[c]);
 
@@ -100,6 +125,7 @@ export function getRoom(id) {
 export function updateRoom(id, fields) {
 	const columns = ROOM_COLUMNS.filter((c) => fields[c] !== undefined);
 	if (columns.length === 0) return getRoom(id);
+	validateRoomFields(fields, columns);
 
 	const assignments = columns.map((c) => `${c} = ?`).join(', ');
 	const values = columns.map((c) => fields[c]);

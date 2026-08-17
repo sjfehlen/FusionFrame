@@ -1,4 +1,15 @@
 import { db } from './db.js';
+import { assertBindable, assertNumericFields } from './apiHelpers.js';
+
+const PURCHASE_COLUMNS = [
+	'item',
+	'vendor',
+	'price',
+	'status',
+	'link',
+	'room_id',
+	'whole_home_item_id'
+];
 
 export function createPurchase({ item, vendor = '', price = null, status = 'researching', link = '', room_id = null, whole_home_item_id = null }) {
 	const hasRoom = room_id !== null && room_id !== undefined;
@@ -6,6 +17,10 @@ export function createPurchase({ item, vendor = '', price = null, status = 'rese
 	if (hasRoom === hasWholeHome) {
 		throw new Error('A purchase must be linked to exactly one of room_id or whole_home_item_id');
 	}
+
+	const fields = { item, vendor, price, status, link, room_id, whole_home_item_id };
+	assertNumericFields(fields, ['price', 'room_id', 'whole_home_item_id']);
+	assertBindable(fields, PURCHASE_COLUMNS);
 
 	const { lastInsertRowid } = db
 		.prepare(
