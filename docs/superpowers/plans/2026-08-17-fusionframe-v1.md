@@ -290,7 +290,6 @@ export const ROOM_TYPES = [
 // scope for every default below is always 'room' — room types only ever pre-populate room-scoped categories
 export const ROOM_TYPE_DEFAULTS = [
 	{ room_type_key: 'kitchen', category_key: 'non_tech' },
-	{ room_type_key: 'kitchen', category_key: 'electrical' },
 	{ room_type_key: 'kitchen', category_key: 'networking' },
 
 	{ room_type_key: 'bathroom', category_key: 'non_tech' },
@@ -312,7 +311,6 @@ export const ROOM_TYPE_DEFAULTS = [
 
 	{ room_type_key: 'garage', category_key: 'security' },
 	{ room_type_key: 'garage', category_key: 'climate' },
-	{ room_type_key: 'garage', category_key: 'electrical' }
 ];
 
 export const ROOM_TYPE_CHECKLIST_DEFAULTS = [
@@ -541,7 +539,7 @@ describe('db schema and seed', () => {
 			)
 			.all()
 			.map((r) => r.key);
-		expect(rows.sort()).toEqual(['electrical', 'networking', 'non_tech']);
+		expect(rows.sort()).toEqual(['networking', 'non_tech']);
 	});
 
 	it('is idempotent — re-running the seed INSERT OR IGNORE statements does not duplicate rows', async () => {
@@ -607,7 +605,7 @@ describe('rooms', () => {
 		const room = createRoom({ name: 'Main Kitchen', room_type_id: kitchenTypeId, sqft: 220 });
 
 		expect(room.name).toBe('Main Kitchen');
-		expect(room.categories.map((c) => c.key).sort()).toEqual(['electrical', 'networking', 'non_tech']);
+		expect(room.categories.map((c) => c.key).sort()).toEqual(['networking', 'non_tech']);
 		expect(room.checklist.map((c) => c.label).sort()).toEqual(
 			['Dishwasher', 'Garbage disposal', 'Range/oven', 'Refrigerator', 'Sink', 'Vent hood'].sort()
 		);
