@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { getRoom, updateRoom, deleteRoom } from '$lib/server/rooms.js';
+import { parseJsonBody, mutate } from '$lib/server/apiHelpers.js';
 
 export function GET({ params }) {
 	const room = getRoom(params.id);
@@ -10,9 +11,16 @@ export function GET({ params }) {
 export async function PATCH({ params, request }) {
 	const existing = getRoom(params.id);
 	if (!existing) return json({ error: 'room not found' }, { status: 404 });
-	const fields = await request.json();
-	const room = updateRoom(params.id, fields);
-	return json({ room });
+
+	const parsed = await parseJsonBody(request);
+	if (parsed.error) return json({ error: parsed.error }, { status: 400 });
+
+	// updateRoom validates numeric/bindable fields and throws on bad input;
+	// mutate() turns that into a 400 rather than an uncaught 500.
+	return mutate(
+		() => updateRoom(params.id, parsed.body),
+		(room) => ({ room })
+	);
 }
 
 export function DELETE({ params }) {
