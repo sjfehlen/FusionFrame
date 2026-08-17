@@ -1,6 +1,6 @@
 import { listRooms, createRoom } from '$lib/server/rooms.js';
 import { db } from '$lib/server/db.js';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 export function load() {
 	const rooms = listRooms();
@@ -13,6 +13,12 @@ export const actions = {
 		const form = await request.formData();
 		const name = form.get('name');
 		const roomTypeId = form.get('room_type_id');
+		if (roomTypeId) {
+			const roomType = db.prepare('SELECT id FROM room_types WHERE id = ?').get(Number(roomTypeId));
+			if (!roomType) {
+				return fail(400, { error: 'invalid room_type_id' });
+			}
+		}
 		const room = createRoom({
 			name,
 			room_type_id: roomTypeId ? Number(roomTypeId) : undefined

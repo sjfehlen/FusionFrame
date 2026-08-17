@@ -42,6 +42,21 @@ describe('rooms', () => {
 		expect(updated.paint_color).toBe('Sage Green');
 	});
 
+	it('updateAttributes action sets a physical attribute to null when submitted as an empty string', async () => {
+		const { actions } = await import('../src/routes/rooms/[id]/+page.server.js');
+		const room = createRoom({ name: 'Bedroom', paint_color: 'Sky Blue' });
+		expect(room.paint_color).toBe('Sky Blue');
+
+		const formData = new FormData();
+		formData.set('paint_color', '');
+		await actions.updateAttributes({
+			params: { id: room.id },
+			request: { formData: async () => formData }
+		});
+
+		expect(getRoom(room.id).paint_color).toBeNull();
+	});
+
 	it('deleteRoom removes the room and its materialized categories/checklist', () => {
 		const kitchenTypeId = db.prepare("SELECT id FROM room_types WHERE key = 'kitchen'").get().id;
 		const room = createRoom({ name: 'Temp Kitchen', room_type_id: kitchenTypeId });

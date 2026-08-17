@@ -1,6 +1,7 @@
 import { listPurchases, createPurchase } from '$lib/server/purchases.js';
 import { listRooms } from '$lib/server/rooms.js';
 import { listWholeHomeItems } from '$lib/server/wholeHomeItems.js';
+import { fail } from '@sveltejs/kit';
 
 export function load() {
 	return {
@@ -14,6 +15,9 @@ export const actions = {
 	create: async ({ request }) => {
 		const form = await request.formData();
 		const target = form.get('target'); // "room:3" or "whole_home_item:2"
+		if (!target || !/^(room|whole_home_item):\d+$/.test(target)) {
+			return fail(400, { error: 'target must be in the form "room:<id>" or "whole_home_item:<id>"' });
+		}
 		const [kind, id] = target.split(':');
 
 		const fields = {

@@ -1,6 +1,6 @@
 import { listWholeHomeItems, createWholeHomeItem } from '$lib/server/wholeHomeItems.js';
 import { db } from '$lib/server/db.js';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 export function load() {
 	const items = listWholeHomeItems();
@@ -11,11 +11,16 @@ export function load() {
 export const actions = {
 	create: async ({ request }) => {
 		const form = await request.formData();
-		const item = createWholeHomeItem({
-			name: form.get('name'),
-			category_id: Number(form.get('category_id')),
-			notes: form.get('notes') || ''
-		});
+		let item;
+		try {
+			item = createWholeHomeItem({
+				name: form.get('name'),
+				category_id: Number(form.get('category_id')),
+				notes: form.get('notes') || ''
+			});
+		} catch (err) {
+			return fail(400, { error: err.message });
+		}
 		redirect(303, `/whole-home/${item.id}`);
 	}
 };
