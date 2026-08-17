@@ -12,6 +12,9 @@ export const actions = {
 	create: async ({ request }) => {
 		const form = await request.formData();
 		const name = form.get('name');
+		if (!name || !String(name).trim()) {
+			return fail(400, { error: 'name is required' });
+		}
 		const roomTypeId = form.get('room_type_id');
 		if (roomTypeId) {
 			const roomType = db.prepare('SELECT id FROM room_types WHERE id = ?').get(Number(roomTypeId));

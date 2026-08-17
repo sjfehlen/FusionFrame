@@ -11,10 +11,14 @@ export function load() {
 export const actions = {
 	create: async ({ request }) => {
 		const form = await request.formData();
+		const name = form.get('name');
+		if (!name || !String(name).trim()) {
+			return fail(400, { error: 'name is required' });
+		}
 		let item;
 		try {
 			item = createWholeHomeItem({
-				name: form.get('name'),
+				name,
 				category_id: Number(form.get('category_id')),
 				notes: form.get('notes') || ''
 			});
