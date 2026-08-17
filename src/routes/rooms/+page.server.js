@@ -1,6 +1,7 @@
 import { listRooms, createRoom } from '$lib/server/rooms.js';
 import { db } from '$lib/server/db.js';
 import { fail, redirect } from '@sveltejs/kit';
+import { readFormString, readFormNumber } from '$lib/server/apiHelpers.js';
 
 export function load() {
 	const rooms = listRooms();
@@ -11,21 +12,30 @@ export function load() {
 export const actions = {
 	create: async ({ request }) => {
 		const form = await request.formData();
-		const name = form.get('name');
-		if (!name || !String(name).trim()) {
-			return fail(400, { error: 'name is required' });
-		}
-		const roomTypeId = form.get('room_type_id');
-		if (roomTypeId) {
-			const roomType = db.prepare('SELECT id FROM room_types WHERE id = ?').get(Number(roomTypeId));
+
+		const name = readFormString(form, 'name', { required: true });
+		if (name.error) return fail(400, { error: name.error });
+
+		const roomTypeId = readFormNumber(form, 'room_type_id');
+		if (roomTypeId.error) return fail(400, { error: roomTypeId.error });
+		if (roomTypeId.value !== null) {
+			const roomType = db
+				.prepare('SELECT id FROM room_types WHERE id = ?')
+				.get(roomTypeId.value);
 			if (!roomType) {
 				return fail(400, { error: 'invalid room_type_id' });
 			}
 		}
-		const room = createRoom({
-			name,
-			room_type_id: roomTypeId ? Number(roomTypeId) : undefined
-		});
+
+		let room;
+		try {
+			room = createRoom({
+				name: name.value,
+				room_type_id: roomTypeId.value ?? undefined
+			});
+		} catch (err) {
+			return fail(400, { error: err.message });
+		}
 		redirect(303, `/rooms/${room.id}`);
 	}
 };

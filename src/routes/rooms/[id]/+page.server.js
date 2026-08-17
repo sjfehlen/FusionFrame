@@ -1,6 +1,7 @@
-import { getRoom, updateRoom } from '$lib/server/rooms.js';
+import { getRoom, updateRoom, NUMERIC_ROOM_FIELDS } from '$lib/server/rooms.js';
 import { db } from '$lib/server/db.js';
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, fail } from '@sveltejs/kit';
+import { readFormString, readFormNumber } from '$lib/server/apiHelpers.js';
 
 const PHYSICAL_FIELDS = [
 	'sqft',
@@ -28,10 +29,21 @@ export const actions = {
 		const form = await request.formData();
 		const fields = {};
 		for (const key of PHYSICAL_FIELDS) {
-			const value = form.get(key);
-			if (value !== null) fields[key] = value === '' ? null : value;
+			if (form.get(key) === null) continue;
+			// Numeric attributes must parse as real numbers — a non-numeric
+			// distance_from_closet_ft otherwise silently poisons the network
+			// summary with NaN. Text fields must genuinely be strings: a
+			// multipart post can make form.get() return a File.
+			const isNumeric = NUMERIC_ROOM_FIELDS.includes(key);
+			const result = isNumeric ? readFormNumber(form, key) : readFormString(form, key);
+			if (result.error) return fail(400, { error: result.error });
+			fields[key] = result.value === '' ? null : result.value;
 		}
-		updateRoom(params.id, fields);
+		try {
+			updateRoom(params.id, fields);
+		} catch (err) {
+			return fail(400, { error: err.message });
+		}
 		return { success: true };
 	}
 };
