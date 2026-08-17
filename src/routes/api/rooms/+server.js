@@ -10,6 +10,10 @@ export async function POST({ request }) {
 	if (!fields.name) {
 		return json({ error: 'name is required' }, { status: 400 });
 	}
-	const room = createRoom(fields);
-	return json({ room }, { status: 201 });
+	try {
+		const room = createRoom(fields);
+		return json({ room }, { status: 201 });
+	} catch (err) {
+		return json({ error: err.message }, { status: 400 });
+	}
 }

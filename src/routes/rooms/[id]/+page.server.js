@@ -29,7 +29,7 @@ export const actions = {
 		const fields = {};
 		for (const key of PHYSICAL_FIELDS) {
 			const value = form.get(key);
-			if (value !== null && value !== '') fields[key] = value;
+			if (value !== null) fields[key] = value === '' ? null : value;
 		}
 		updateRoom(params.id, fields);
 		return { success: true };

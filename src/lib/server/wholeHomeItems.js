@@ -1,6 +1,13 @@
 import { db } from './db.js';
 
 export function createWholeHomeItem({ category_id, name, notes = '' }) {
+	const category = db
+		.prepare("SELECT id FROM categories WHERE id = ? AND scope = 'whole_home'")
+		.get(category_id);
+	if (!category) {
+		throw new Error('category_id must reference a whole_home-scoped category');
+	}
+
 	const { lastInsertRowid } = db
 		.prepare('INSERT INTO whole_home_items (category_id, name, notes) VALUES (?, ?, ?)')
 		.run(category_id, name, notes);

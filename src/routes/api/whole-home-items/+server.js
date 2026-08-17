@@ -10,6 +10,10 @@ export async function POST({ request }) {
 	if (!fields.name || !fields.category_id) {
 		return json({ error: 'name and category_id are required' }, { status: 400 });
 	}
-	const item = createWholeHomeItem(fields);
-	return json({ whole_home_item: item }, { status: 201 });
+	try {
+		const item = createWholeHomeItem(fields);
+		return json({ whole_home_item: item }, { status: 201 });
+	} catch (err) {
+		return json({ error: err.message }, { status: 400 });
+	}
 }
