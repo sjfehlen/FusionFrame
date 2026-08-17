@@ -34,7 +34,7 @@ describe('db schema and seed', () => {
 			)
 			.all()
 			.map((r) => r.key);
-		expect(rows.sort()).toEqual(['networking', 'non_tech']);
+		expect(rows.sort()).toEqual(['electrical', 'networking', 'non_tech']);
 	});
 
 	it('is idempotent — re-running the seed INSERT OR IGNORE statements does not duplicate rows', async () => {

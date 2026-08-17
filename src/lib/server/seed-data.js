@@ -34,6 +34,7 @@ export const ROOM_TYPES = [
 // scope for every default below is always 'room' — room types only ever pre-populate room-scoped categories
 export const ROOM_TYPE_DEFAULTS = [
 	{ room_type_key: 'kitchen', category_key: 'non_tech' },
+	{ room_type_key: 'kitchen', category_key: 'electrical' },
 	{ room_type_key: 'kitchen', category_key: 'networking' },
 
 	{ room_type_key: 'bathroom', category_key: 'non_tech' },
@@ -55,6 +56,7 @@ export const ROOM_TYPE_DEFAULTS = [
 
 	{ room_type_key: 'garage', category_key: 'security' },
 	{ room_type_key: 'garage', category_key: 'climate' },
+	{ room_type_key: 'garage', category_key: 'electrical' }
 ];
 
 export const ROOM_TYPE_CHECKLIST_DEFAULTS = [
