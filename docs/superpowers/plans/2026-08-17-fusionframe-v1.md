@@ -258,12 +258,11 @@ export const CATEGORIES = [
 	{ scope: 'room', key: 'presence', label: 'Presence', sort_order: 1 },
 	{ scope: 'room', key: 'light', label: 'Light', sort_order: 2 },
 	{ scope: 'room', key: 'climate', label: 'Climate', sort_order: 3 },
-	{ scope: 'room', key: 'electrical', label: 'Electrical', sort_order: 4 },
-	{ scope: 'room', key: 'networking', label: 'Networking', sort_order: 5 },
-	{ scope: 'room', key: 'automations', label: 'Automations', sort_order: 6 },
-	{ scope: 'room', key: 'sound', label: 'Sound', sort_order: 7 },
-	{ scope: 'room', key: 'security', label: 'Security', sort_order: 8 },
-	{ scope: 'room', key: 'non_tech', label: 'Non-tech', sort_order: 9 },
+	{ scope: 'room', key: 'networking', label: 'Networking', sort_order: 4 },
+	{ scope: 'room', key: 'automations', label: 'Automations', sort_order: 5 },
+	{ scope: 'room', key: 'sound', label: 'Sound', sort_order: 6 },
+	{ scope: 'room', key: 'security', label: 'Security', sort_order: 7 },
+	{ scope: 'room', key: 'non_tech', label: 'Non-tech', sort_order: 8 },
 
 	{ scope: 'whole_home', key: 'networking', label: 'Networking', sort_order: 1 },
 	{ scope: 'whole_home', key: 'electrical', label: 'Electrical', sort_order: 2 },
@@ -520,7 +519,7 @@ describe('db schema and seed', () => {
 	it('seeds room-scoped and whole-home-scoped categories', () => {
 		const roomCount = db.prepare("SELECT COUNT(*) AS n FROM categories WHERE scope = 'room'").get().n;
 		const wholeHomeCount = db.prepare("SELECT COUNT(*) AS n FROM categories WHERE scope = 'whole_home'").get().n;
-		expect(roomCount).toBe(9);
+		expect(roomCount).toBe(8);
 		expect(wholeHomeCount).toBe(9);
 	});
 
