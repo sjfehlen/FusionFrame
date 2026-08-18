@@ -140,3 +140,31 @@ export function updateRoom(id, fields) {
 export function deleteRoom(id) {
 	db.prepare('DELETE FROM rooms WHERE id = ?').run(id);
 }
+
+const CHECKLIST_STATUSES = ['considering', 'chosen', 'rejected'];
+const CHECKLIST_COLUMNS = ['status', 'notes', 'rejected_reason'];
+
+export function getChecklistItem(roomId, itemId) {
+	return db
+		.prepare('SELECT * FROM checklist_items WHERE room_id = ? AND id = ?')
+		.get(roomId, itemId);
+}
+
+export function updateChecklistItem(roomId, itemId, fields) {
+	const columns = CHECKLIST_COLUMNS.filter((c) => fields[c] !== undefined);
+	if (columns.length === 0) return getChecklistItem(roomId, itemId);
+	if (fields.status !== undefined && !CHECKLIST_STATUSES.includes(fields.status)) {
+		throw new Error(`status must be one of ${CHECKLIST_STATUSES.join(', ')}`);
+	}
+	assertBindable(fields, columns);
+
+	const assignments = columns.map((c) => `${c} = ?`).join(', ');
+	const values = columns.map((c) => fields[c]);
+	db.prepare(`UPDATE checklist_items SET ${assignments} WHERE room_id = ? AND id = ?`).run(
+		...values,
+		roomId,
+		itemId
+	);
+
+	return getChecklistItem(roomId, itemId);
+}

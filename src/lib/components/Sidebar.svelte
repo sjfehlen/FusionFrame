@@ -2,52 +2,29 @@
 	let { current = '' } = $props();
 
 	const links = [
-		{ href: '/rooms', label: 'Rooms' },
-		{ href: '/whole-home', label: 'Whole-Home Items' },
-		{ href: '/purchases', label: 'Purchases' }
+		{ href: '/rooms', label: 'Rooms', icon: '🛋️' },
+		{ href: '/whole-home', label: 'Whole-Home Items', icon: '🏠' },
+		{ href: '/purchases', label: 'Purchases', icon: '🧾' }
 	];
 </script>
 
-<nav class="sidebar">
-	<div class="brand">FusionFrame</div>
-	<ul>
+<nav class="flex w-60 shrink-0 flex-col border-r border-border bg-surface px-4 py-6">
+	<div class="mb-8 px-2 text-lg font-bold tracking-tight text-fg">FusionFrame</div>
+	<ul class="flex flex-col gap-1">
 		{#each links as link}
 			<li>
-				<a href={link.href} class:active={current.startsWith(link.href)}>{link.label}</a>
+				<a
+					href={link.href}
+					class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition {current.startsWith(
+						link.href
+					)
+						? 'bg-accent text-accent-fg'
+						: 'text-fg/80 hover:bg-accent-soft hover:text-accent'}"
+				>
+					<span aria-hidden="true">{link.icon}</span>
+					{link.label}
+				</a>
 			</li>
 		{/each}
 	</ul>
 </nav>
-
-<style>
-	.sidebar {
-		width: 220px;
-		flex-shrink: 0;
-		border-right: 1px solid var(--border);
-		padding: 1.5rem 1rem;
-		min-height: 100vh;
-	}
-	.brand {
-		font-weight: 700;
-		margin-bottom: 1.5rem;
-	}
-	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-	a {
-		display: block;
-		padding: 0.5rem 0.75rem;
-		border-radius: 6px;
-		color: var(--fg);
-		text-decoration: none;
-	}
-	a.active {
-		background: var(--accent);
-		color: white;
-	}
-</style>

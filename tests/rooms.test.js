@@ -4,12 +4,14 @@ import path from 'node:path';
 import os from 'node:os';
 
 describe('rooms', () => {
-	let db, createRoom, getRoom, listRooms, updateRoom, deleteRoom;
+	let db, createRoom, getRoom, listRooms, updateRoom, deleteRoom, updateChecklistItem;
 
 	beforeAll(async () => {
 		process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'fusionframe-test-'));
 		({ db } = await import('../src/lib/server/db.js'));
-		({ createRoom, getRoom, listRooms, updateRoom, deleteRoom } = await import('../src/lib/server/rooms.js'));
+		({ createRoom, getRoom, listRooms, updateRoom, deleteRoom, updateChecklistItem } = await import(
+			'../src/lib/server/rooms.js'
+		));
 	});
 
 	it('materializes the kitchen room type\'s default categories and checklist on creation', () => {
@@ -55,6 +57,18 @@ describe('rooms', () => {
 		});
 
 		expect(getRoom(room.id).paint_color).toBeNull();
+	});
+
+	it('updateChecklistItem changes status and rejects an invalid value', () => {
+		const kitchenTypeId = db.prepare("SELECT id FROM room_types WHERE key = 'kitchen'").get().id;
+		const room = createRoom({ name: 'Checklist Kitchen', room_type_id: kitchenTypeId });
+		const item = room.checklist[0];
+		expect(item.status).toBe('considering');
+
+		const updated = updateChecklistItem(room.id, item.id, { status: 'chosen' });
+		expect(updated.status).toBe('chosen');
+
+		expect(() => updateChecklistItem(room.id, item.id, { status: 'not-a-status' })).toThrow();
 	});
 
 	it('deleteRoom removes the room and its materialized categories/checklist', () => {
