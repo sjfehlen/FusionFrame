@@ -10,8 +10,16 @@ agent can research topics and write findings directly into the app.
 
 FusionFrame is a fully standalone Docker container — no external services required.
 
+**Build from source:**
+
 ```bash
 docker compose up --build
+```
+
+**Or pull the published image** (built and pushed to GHCR on every push to `main`):
+
+```bash
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 Then open `http://localhost:3000`.

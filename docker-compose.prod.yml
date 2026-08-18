@@ -1,0 +1,14 @@
+services:
+  fusionframe:
+    image: ghcr.io/sjfehlen/fusionframe:latest
+    container_name: fusionframe
+    ports:
+      - "3000:3000"
+    environment:
+      - ORIGIN=http://localhost:3000
+    volumes:
+      - fusionframe-data:/data
+    restart: unless-stopped
+
+volumes:
+  fusionframe-data:
